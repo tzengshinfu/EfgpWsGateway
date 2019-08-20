@@ -1,0 +1,34 @@
+import org.apache.axis.client.Call;
+import org.apache.axis.client.Service;
+import java.net.URL;
+import javax.xml.namespace.QName;
+
+public class Gateway {
+    public Service service;
+    public String nameSpace;
+    public QName port;
+    public String wsUrl;
+    public Call call;
+
+    public Gateway() throws Exception {
+        wsUrl = "<WSDL檔路徑>";
+        nameSpace = "<targetNamespace>";
+        service = new Service(new URL(wsUrl),new QName(nameSpace, "<service name>"));
+        port = new QName(nameSpace, "<port name>");
+    }
+
+    //EasyFlow流程Invoke關卡回傳值只支援基本型態,不支援複合型態
+    public String 呼叫方法名稱(String param1, String param2, String param3, String param4) throws Exception {
+        try {
+            String currentFunctionName = Thread.currentThread().getStackTrace()[1].getMethodName(); //web service method名稱帶入現在呼叫的function名稱
+            QName operation = new QName(nameSpace, currentFunctionName);
+            Call call = (Call) service.createCall(port, operation);
+            String result = (String)call.invoke(new Object[]{param1, param2, param3, param4});
+
+            return result;
+        }
+        catch (Exception e) {
+            return e.toString();
+        }
+    }
+}
